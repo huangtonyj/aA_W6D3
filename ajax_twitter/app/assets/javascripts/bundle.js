@@ -86,12 +86,47 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./frontend/api_util.js":
+/*!******************************!*\
+  !*** ./frontend/api_util.js ***!
+  \******************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+const APIUtil = {
+  followUser: id => {
+
+    return $.ajax({
+      method: 'POST',
+      url: `/users/${id}/follow`,
+      dataType: 'JSON',
+    });
+
+  },
+  
+  unfollowUser: id => {
+
+    return $.ajax({
+      method: 'DELETE',
+      url: `/users/${id}/follow`,
+      dataType: 'JSON',
+    });
+
+  }
+};
+
+module.exports = APIUtil;
+
+/***/ }),
+
 /***/ "./frontend/follow_toggle.js":
 /*!***********************************!*\
   !*** ./frontend/follow_toggle.js ***!
   \***********************************/
 /*! no static exports found */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+const APIUtil = __webpack_require__(/*! ./api_util.js */ "./frontend/api_util.js");
 
 class FollowToggle {
   constructor(el) {
@@ -104,39 +139,52 @@ class FollowToggle {
   }
   
   render(){
-    console.log(this);
-    if (this.followState === true) {
-      this.$el.text("Unfollow!");
-    } else {
-      this.$el.text("Follow!");
-    }
+    this.$el.text(this.followState ? "Unfollow!" : "Follow!");
   }
   
   handleClick(event){
     event.preventDefault();
+      
+    this.$el.prop("disabled", true);
+  
+    if (this.followState) {
+      this.$el.text("Unfollowing...");
+      APIUtil.unfollowUser(this.userId)
+      .then(() => {
+        this.followState = false;
+        this.render();
+      });
+    } else {
+      this.$el.text("Following...");
+      APIUtil.followUser(this.userId)
+      .then(() => {
+        this.followState = true;
+        this.render();
+      });
+    }
+    this.$el.prop("disabled", false);
     
-    let method = this.followState ? 'DELETE' : 'POST';
-          
-    $.ajax({
-      method: method,
-      url: `/users/${this.userId}/follow`,
-      dataType: 'JSON',
-      // data: {
-      //   followee_id: this.userId
-        // follower_id: this.currentUserId
-      // },
-      // success: () => {
-      //   console.log("Success!");
-      //   this.followState = this.followState ? false : true;
-      //   this.render();
-      // }
-    })
-    .then((res) => console.log(res))
-    .then(() => {
-      console.log("Success!");
-      this.followState = this.followState ? false : true;
-      this.render();
-    });
+    // Before refactor:
+    // let method = this.followState ? 'DELETE' : 'POST';
+    
+    // $.ajax({
+    //   method: method,
+    //   url: `/users/${this.userId}/follow`,
+    //   dataType: 'JSON',
+    //   // data: {
+    //   //   followee_id: this.userId
+    //     // follower_id: this.currentUserId
+    //   // },
+    //   // success: () => {
+    //   //   console.log("Success!");
+    //   //   this.followState = this.followState ? false : true;
+    //   //   this.render();
+    //   // }
+    // })
+    // .then(() => {
+    //   this.followState = this.followState ? false : true;
+    //   this.render();
+    // });
   }
 }
 

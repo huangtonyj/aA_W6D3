@@ -1,3 +1,5 @@
+const APIUtil = require('./api_util.js');
+
 class FollowToggle {
   constructor(el) {
     this.$el = $(`.${el}`);
@@ -9,39 +11,52 @@ class FollowToggle {
   }
   
   render(){
-    console.log(this);
-    if (this.followState === true) {
-      this.$el.text("Unfollow!");
-    } else {
-      this.$el.text("Follow!");
-    }
+    this.$el.text(this.followState ? "Unfollow!" : "Follow!");
   }
   
   handleClick(event){
     event.preventDefault();
+      
+    this.$el.prop("disabled", true);
+  
+    if (this.followState) {
+      this.$el.text("Unfollowing...");
+      APIUtil.unfollowUser(this.userId)
+      .then(() => {
+        this.followState = false;
+        this.render();
+      });
+    } else {
+      this.$el.text("Following...");
+      APIUtil.followUser(this.userId)
+      .then(() => {
+        this.followState = true;
+        this.render();
+      });
+    }
+    this.$el.prop("disabled", false);
     
-    let method = this.followState ? 'DELETE' : 'POST';
-          
-    $.ajax({
-      method: method,
-      url: `/users/${this.userId}/follow`,
-      dataType: 'JSON',
-      // data: {
-      //   followee_id: this.userId
-        // follower_id: this.currentUserId
-      // },
-      // success: () => {
-      //   console.log("Success!");
-      //   this.followState = this.followState ? false : true;
-      //   this.render();
-      // }
-    })
-    .then((res) => console.log(res))
-    .then(() => {
-      console.log("Success!");
-      this.followState = this.followState ? false : true;
-      this.render();
-    });
+    // Before refactor:
+    // let method = this.followState ? 'DELETE' : 'POST';
+    
+    // $.ajax({
+    //   method: method,
+    //   url: `/users/${this.userId}/follow`,
+    //   dataType: 'JSON',
+    //   // data: {
+    //   //   followee_id: this.userId
+    //     // follower_id: this.currentUserId
+    //   // },
+    //   // success: () => {
+    //   //   console.log("Success!");
+    //   //   this.followState = this.followState ? false : true;
+    //   //   this.render();
+    //   // }
+    // })
+    // .then(() => {
+    //   this.followState = this.followState ? false : true;
+    //   this.render();
+    // });
   }
 }
 
