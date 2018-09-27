@@ -201,12 +201,53 @@ module.exports = FollowToggle;
 /***/ (function(module, exports, __webpack_require__) {
 
 const FollowToggle = __webpack_require__(/*! ./follow_toggle.js */ "./frontend/follow_toggle.js");
+const UsersSearch = __webpack_require__(/*! ./users_search.js */ "./frontend/users_search.js");
 
 $( () => {
   const followToggle = new FollowToggle("follow-toggle");
-  // console.log(followToggle);
-  // followToggle.render();
+  const userSearch = new UsersSearch(".users-search");
 });
+
+/***/ }),
+
+/***/ "./frontend/users_search.js":
+/*!**********************************!*\
+  !*** ./frontend/users_search.js ***!
+  \**********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+class UsersSearch {
+  constructor(el) {
+    this.$el = $(el);   
+    this.$input = $(".search"); 
+    
+    this.$el.on('keydown', 
+      (event) => this.handleKeyDown(event));
+    this.$input.on('keyDown', 
+      (event) => this.handleKeyDown(event));
+  }
+  
+  handleKeyDown(event){
+    console.log("KEY WAS DOWN");
+    // event.preventDefault();
+    // 
+    // let input = $(".search");
+    // console.log(input);
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+}
+
+module.exports = UsersSearch;
 
 /***/ })
 
